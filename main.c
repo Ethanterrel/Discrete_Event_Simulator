@@ -345,3 +345,90 @@ void pqSort()
 
 }
 
+
+void processarrival(struct event oldEvent)
+{
+
+    fprintf(logFile, "\nFor time %d the process at %d arrives to the system",
+            oldEvent.time, oldEvent.id);
+
+    if(cpuBusy == 1 || cpuSize > 0)
+    {
+        fprintf(logFile, "\nFor time %d the process at %d enters the CPU queue",
+                oldEvent.time, oldEvent.id); enqueue(1, oldEvent.id);
+
+    } else {
+        struct event newEvent; newEvent.time = oldEvent.time; newEvent.type = cpuarrival;
+        newEvent.id = oldEvent.id; cpuBusy = 1;
+        pEnqueue(newEvent);
+    }
+
+    // create new event
+    struct event newEvent;
+    newEvent.time = oldEvent.time + randNum(ARRIVE_MIN, ARRIVE_MAX); newEvent.type = arrival;
+    newEvent.id = id(); pEnqueue(newEvent);
+
+}
+
+void arriveatcpu(struct event oldEvent) {
+    fprintf(logFile, "\nFor time %d the process at %d enters the CPU",
+            oldEvent.time, oldEvent.id); struct event newEvent; int num = randNum(CPU_MIN, CPU_MAX);
+
+    cpuUtil += num; cpuCount++;
+    if (num > cpuMaxResponse) {
+        cpuMaxResponse = num;
+    }
+
+    newEvent.time = oldEvent.time + num; newEvent.type = cpufinish;
+    newEvent.id = oldEvent.id; pEnqueue(newEvent);
+}
+
+void finishatcpu(struct event oldEvent) {
+    cpuBusy = 0;
+    int num = randNum(1, 100);
+
+    fprintf(logFile, "\nFor time %d the process at %d exits the CPU",
+            oldEvent.time, oldEvent.id);
+
+    if (num < QUIT_PROB) {
+        struct event newEvent; newEvent.time = oldEvent.time; newEvent.type = exitsys;
+        newEvent.id = oldEvent.id; pEnqueue(newEvent);
+
+    } else if(num < NETWORK_PROB) {
+        if(netBusy == 0) {
+            struct event newEvent; newEvent.time = oldEvent.time; newEvent.type = narrival;
+            newEvent.id = oldEvent.id; netBusy = 1; pEnqueue(newEvent);
+        } else {
+            enqueue(4, oldEvent.id);
+        }
+    } else if (d1Busy == 0) {
+        struct event newEvent; newEvent.time = oldEvent.time; newEvent.type = d1arrival;
+        newEvent.id = oldEvent.id; d1Busy = 1; pEnqueue(newEvent);
+
+    } else if (d2Busy == 0) { // if disk2 is not occupied
+        struct event newEvent; newEvent.time = oldEvent.time; newEvent.type = d2arrival;
+        newEvent.id = oldEvent.id; d2Busy = 1; pEnqueue(newEvent);
+
+    } else if (d1Size <= d2Size){
+        enqueue(2, oldEvent.id);
+    } else {
+        enqueue(3, oldEvent.id);
+    }
+
+    // if CPU queue is nonempty, create process_arrive_cpu event
+    if(cpuSize > 0) {
+        int newID = dequeue(1); // pull process off cpu queue
+        struct event newEvent;
+        newEvent.time = oldEvent.time;
+        newEvent.type = cpuarrival;
+        newEvent.id = newID;
+        cpuBusy = 1; // set cpu to occupied
+        pEnqueue(newEvent);
+    }
+
+}
+
+void exitsystem(struct event oldEvent) {
+    fprintf(logFile, "\nFor time %d the process at %d exits the system",
+            oldEvent.time, oldEvent.id);
+}
