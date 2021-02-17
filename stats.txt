@@ -1,0 +1,24 @@
+
+Max Size of the Queue was:
+CPU = 3
+Disk 1 = 111
+Disk 2 = 111
+Network = 7
+
+Average Size of the Queue was:
+CPU = 0.688281
+Disk 1 = 56.915870
+Disk 2 = 56.865839
+Network = 1.454286
+
+Utilization:
+CPU = 0.613867
+Disk 1 = 0.996600
+Disk 2 = 0.996333
+Network - 0.651533
+
+Throughput:
+CPU = 0.174667
+Disk 1 = 0.066800
+Disk 2 = 0.023533
+Network = 0.017667

@@ -318,7 +318,7 @@ struct event pDequeue()
     struct event e;
     if(pFront == -1)
     {
-        printf("\nempty\n");
+        printf("\nqueue is empty\n");
         return e;
     } else if (pFront == pRear)
     {
@@ -431,4 +431,160 @@ void finishatcpu(struct event oldEvent) {
 void exitsystem(struct event oldEvent) {
     fprintf(logFile, "\nFor time %d the process at %d exits the system",
             oldEvent.time, oldEvent.id);
+
+}
+
+void arriveatdisk1(struct event oldEvent) {
+    fprintf(logFile, "\nFor time %d the process at %d enters disk 1",
+            oldEvent.time, oldEvent.id);
+    struct event newEvent;
+    int num = randNum(DISK1_MIN, DISK1_MAX);
+
+    // stats file
+    d1Util += num;
+    d1Count++;
+    if (num > d1MaxResponse) {
+        d1MaxResponse = num;
+    }
+
+    newEvent.time = oldEvent.time + num;
+    newEvent.type = d1finish;
+    newEvent.id = oldEvent.id;
+    pEnqueue(newEvent);
+}
+
+void arriveatdisk2(struct event oldEvent)
+{
+    fprintf(logFile, "\nFor time %d the process at %d enters disk 2",
+            oldEvent.time, oldEvent.id);
+    struct event newEvent;
+    int num = randNum(DISK2_MIN, DISK2_MAX);
+
+    d2Util += num;
+    d2Count++;
+    if (num > d2MaxResponse)
+    {
+        d2MaxResponse = num;
+    }
+
+    newEvent.time = oldEvent.time + num;
+    newEvent.type = d2finish;
+    newEvent.id = oldEvent.id;
+    pEnqueue(newEvent);
+}
+
+void Disk1finish(struct event oldEvent) {
+
+    d1Busy = 0;
+    fprintf(logFile, "\nFor time %d the process at %d exits disk 1",
+            oldEvent.time, oldEvent.id);
+
+    if(cpuBusy == 1 || cpuSize > 0){
+        fprintf(logFile, "\nFor time %d The process at %d enters the CPU queue",
+                oldEvent.time, oldEvent.id);
+        enqueue(1, oldEvent.id);
+
+    } else {
+        struct event newEvent;
+        newEvent.time = oldEvent.time;
+        newEvent.type = cpuarrival;
+        newEvent.id = oldEvent.id;
+        cpuBusy = 1;
+        pEnqueue(newEvent);
+    }
+
+    if(d1Size > 0) {
+        int newID = dequeue(2);
+        struct event newEvent;
+        newEvent.time = oldEvent.time;
+        newEvent.type = d1arrival;
+        newEvent.id = newID;
+        d1Busy = 1;
+        pEnqueue(newEvent);
+    }
+}
+
+void Disk2finish(struct event oldEvent) {
+
+    d2Busy = 0;
+    fprintf(logFile, "\nfor time %d the process at %d exits disk 2",
+            oldEvent.time, oldEvent.id);
+
+    if(cpuBusy == 1 || cpuSize > 0){
+        fprintf(logFile, "\nfor time %d the process at %d enters the CPU queue",
+                oldEvent.time, oldEvent.id);
+        enqueue(1, oldEvent.id);
+    } else {
+        struct event newEvent;
+        newEvent.time = oldEvent.time; newEvent.type = cpuarrival; newEvent.id = oldEvent.id;
+        cpuBusy = 1; pEnqueue(newEvent);
+    }
+
+    if(d2Size > 0) {
+        int newID = dequeue(3);
+        struct event newEvent; newEvent.time = oldEvent.time; newEvent.type = d2arrival;
+        newEvent.id = newID; d2Busy = 1;
+        pEnqueue(newEvent);
+    }
+}
+
+void arriveatNetwork(struct event oldEvent) {
+    fprintf(logFile, "\nfor time %d the process at %d enters the network",
+            oldEvent.time, oldEvent.id);
+    struct event newEvent;
+    int num = randNum(NETWORK_MIN, NETWORK_MAX);
+
+    netUtil += num;
+    netCount++;
+    if (num > netMaxResponse) {
+        netMaxResponse = num;
+    }
+    newEvent.time = oldEvent.time + num; newEvent.type = finish;
+    newEvent.id = oldEvent.id;pEnqueue(newEvent);
+}
+
+void finishatNetwork(struct event oldEvent) {
+
+    netBusy = 0;
+    fprintf(logFile, "\nFor time %d the process at %d exits the network",
+            oldEvent.time, oldEvent.id);
+
+    if(cpuBusy == 1 || cpuSize > 0){
+        fprintf(logFile, "\nFor time %d the process at %d enters the CPU queue",
+                oldEvent.time, oldEvent.id);
+        enqueue(1, oldEvent.id);
+    } else {
+        struct event newEvent;
+        newEvent.time = oldEvent.time; newEvent.type = cpuarrival;
+        newEvent.id = oldEvent.id; cpuBusy = 1;
+        pEnqueue(newEvent);
+    }
+
+    if(netSize > 0) {
+        int newID = dequeue(4);
+        struct event newEvent; newEvent.time = oldEvent.time;
+        newEvent.type = narrival; newEvent.id = newID;
+        netBusy = 1; pEnqueue(newEvent);
+    }
+}
+
+void finishprocess(struct event oldEvent) {
+
+    /*int SEED, INIT_TIME, FIN_TIME, ARRIVE_MIN, ARRIVE_MAX, QUIT_PROB, NETWORK_PROB, CPU_MIN, CPU_MAX,
+//DISK1_MIN, DISK1_MAX, DISK2_MIN, DISK2_MAX, NETWORK_MIN, NETWORK_MAX;*/
+
+    cpuAvg = cpuAvg/cpuTotal; d1Avg = d1Avg/d1Total; d2Avg = d2Avg/d2Total; netAvg = netAvg/netTotal;
+
+    cpuResponse = cpuUtil/cpuCount; d1Response = d1Util/d1Count; d2Response = d2Util/d2Count; netResponse = netUtil/netCount;
+
+    cpuUtil = cpuUtil/(FIN_TIME - INIT_TIME); d1Util = d1Util/(FIN_TIME - INIT_TIME); d2Util = d2Util/(FIN_TIME - INIT_TIME); netUtil = netUtil/(FIN_TIME - INIT_TIME);
+
+    cpuThroughput = cpuCount/(FIN_TIME - INIT_TIME); d1Throughput = d1Count/(FIN_TIME - INIT_TIME); d2Throughput = d2Count/(FIN_TIME - INIT_TIME); netThroughput = netCount/(FIN_TIME - INIT_TIME);
+
+    fprintf(statsFile, "\nMax Size of the Queue was:\nCPU = %d\nDisk 1 = %d\nDisk 2 = %d\nNetwork = %d\n", cpuMax, d1Max, d2Max, netMax);
+    fprintf(statsFile, "\nAverage Size of the Queue was:\nCPU = %f\nDisk 1 = %f\nDisk 2 = %f\nNetwork = %f\n", cpuAvg, d1Avg, d2Avg, netAvg);
+    fprintf(statsFile, "\nUtilization:\nCPU = %f\nDisk 1 = %f\nDisk 2 = %f\nNetwork - %f\n", cpuUtil, d1Util, d2Util, netUtil);
+    fprintf(statsFile, "\nThroughput:\nCPU = %f\nDisk 1 = %f\nDisk 2 = %f\nNetwork = %f\n", cpuThroughput, d1Throughput, d2Throughput, netThroughput);
+    fprintf(logFile, "\n For time %d jobs have finished", oldEvent.time);
+
 }

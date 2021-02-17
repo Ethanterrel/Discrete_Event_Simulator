@@ -1,0 +1,130 @@
+SEED 4
+INIT_TIME 0
+FIN_TIME 10000
+ARRIVE_MIN 30
+ARRIVE_MAX 40
+QUIT_PROB 15
+NETWORK_PROB 20
+CPU_MIN 20
+CPU_MAX 15
+DISK1_MIN 25
+DISK1_MAX 50
+DISK2_MIN 40
+DISK2_MAX 70
+NETWORK_MIN 80
+NETWORK_MAX 60
+
+
+Max Size of the Queue was:
+CPU = 223
+Disk 1 = 2
+Disk 2 = 2
+Network = 1
+
+Average Size of the Queue was:
+CPU = 109.937991
+Disk 1 = 0.597143
+Disk 2 = 0.568966
+Network = 0.500000
+
+Utilization:
+CPU = 0.997800
+Disk 1 = 0.891200
+Disk 2 = 0.800000
+Network - 0.151100
+
+Throughput:
+CPU = 0.046400
+Disk 1 = 0.024000
+Disk 2 = 0.014400
+Network = 0.001700
+
+You can see here the CPU queue was much larger than the disk or the network queue. As I thought, because all the processes have to pass the CPU that would be why the cpu size and overall queue sizes were higher.
+
+
+SEED 1
+INIT_TIME 0
+FIN_TIME 15000
+ARRIVE_MIN 5
+ARRIVE_MAX 20
+QUIT_PROB 20
+NETWORK_PROB 30
+CPU_MIN 5
+CPU_MAX 15
+DISK1_MIN 10
+DISK1_MAX 50
+DISK2_MIN 90
+DISK2_MAX 80
+NETWORK_MIN 80
+NETWORK_MAX 66
+
+
+Max Size of the Queue was:
+CPU = 528
+Disk 1 = 185
+Disk 2 = 185
+Network = 10
+
+Average Size of the Queue was:
+CPU = 256.088640
+Disk 1 = 94.167945
+Disk 2 = 93.566866
+Network = 3.444056
+
+Utilization:
+CPU = 0.998667
+Disk 1 = 0.999733
+Disk 2 = 0.998200
+Network - 0.901800
+
+Throughput:
+CPU = 0.098800
+Disk 1 = 0.033133
+Disk 2 = 0.010600
+Network = 0.010467
+
+For this run, by decreasing the minimum and maximum load on the CPU process, you can see a lot the queue size and utlization was moved towards the disk 1 and 2. You can see a dramatic increase in these sizes after slightly less processes have to pass through the CPU and must pass through the disks and the network.
+
+SEED 9
+INIT_TIME 0
+FIN_TIME 15000
+ARRIVE_MIN 10
+ARRIVE_MAX 20
+QUIT_PROB 30
+NETWORK_PROB 40
+CPU_MIN 2
+CPU_MAX 5
+DISK1_MIN 10
+DISK1_MAX 20
+DISK2_MIN 40
+DISK2_MAX 45
+NETWORK_MIN 30
+NETWORK_MAX 45
+
+
+Max Size of the Queue was:
+CPU = 3
+Disk 1 = 117
+Disk 2 = 116
+Network = 4
+
+Average Size of the Queue was:
+CPU = 0.700797
+Disk 1 = 60.051691
+Disk 2 = 59.594059
+Network = 1.094637
+
+Utilization:
+CPU = 0.603933
+Disk 1 = 0.993600
+Disk 2 = 0.992867
+Network - 0.631467
+
+Throughput:
+CPU = 0.173000
+Disk 1 = 0.065867
+Disk 2 = 0.023333
+Network = 0.017133
+
+For the Third run, I tried lowering the overall CPU times while slightly keeping the disk times lowered to see what my total throughput and utlization would be. It seemed, as expected, less load managment was put on the CPU and more on the disks and more things needed to get passed through the disks and network.
+
